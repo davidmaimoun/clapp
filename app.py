@@ -24,6 +24,7 @@ st.write("""
       letter-spacing: 10px;
 
    }
+
    h1 {
       font-size: 55px;
       text-shadow: 2px 2px 2px rgb(224, 145, 95);
@@ -33,6 +34,10 @@ st.write("""
    h3 {
       font-weight: 300;
 
+   }
+
+   img *{
+      background-color: lightgrey;
    }
    
    .subtitle {
@@ -198,10 +203,8 @@ def populateImage(search):
          <img src='{MOVIES_DB_URL}/{search[0].poster_path}' alt='movie'>
          """,unsafe_allow_html=True)
 
-def populateImageDefault(search):
-   return st.markdown(f"""
-         <img src='default.jpg' alt="movie">
-         """,unsafe_allow_html=True)
+def populateImageDefault(url):
+   return st.image(url)
 
 def getDfSimilarities(genres):
    df = pd.DataFrame(index=df_movies['title'])
@@ -343,7 +346,7 @@ if container.button('Search Movies !'):
                   if len(search) > 0:
                      populateImage(search)
                   else:
-                     populateImageDefault('default.jpg')
+                     populateImageDefault('assets/default.jpg')
                with col2:
                   populateOverview(row[SYNOPSIS])
                with col3:
@@ -418,7 +421,7 @@ if container.button('Search Movies !'):
                      if len(search) > 0:
                         populateImage(search)
                      else:
-                        populateImageDefault('default.jpg')
+                        populateImageDefault('assets/default.jpg')
                   with col2:
                      populateOverview(row[SYNOPSIS])
                   with col3:
