@@ -204,14 +204,15 @@ def populateImageDefault(search):
          """,unsafe_allow_html=True)
 
 def getDfSimilarities(genres):
-         df = pd.DataFrame(index=df_movies['title'])
-         count_list = []
-         for g in genres:
-            for index, row in df_movies.iterrows():
-                  count_list.append(1 if g in row[GENRES] else 0)
-            df[g] = count_list
-            count_list = []
-         return df
+   df = pd.DataFrame(index=df_movies['title'])
+   count_list = []
+   for g in genres:
+      for index, row in df_movies.iterrows():
+         count_list.append(1 if g in row[GENRES] else 0)
+      df[g] = count_list
+      count_list = []
+   print(df.columns)
+   return df
 
 df_movies = pd.read_csv('data/movies.csv')
 df_movies[DIRECTOR] = df_movies[DIRECTOR].fillna('')
@@ -326,10 +327,11 @@ if container.button('Search Movies !'):
                <h5>Found {len(movies_match)} results for <span class='filter_result'>{input}</span></h5>
                """, unsafe_allow_html=True
          )
-
+         genres_wanted = ''
          for index, row in movies_match.iterrows():
             rating_stars = populateRatingStars(getRatingScore, row['vote_average'])
             search = movie_search.search(row[TITLE])
+            genres_wanted += row[GENRES] + ' '
 
             with st.container():
                populateTitle(id, row[TITLE], row[RELEASE_DATE], row[GENRES], row[RUNTIME])
@@ -348,8 +350,8 @@ if container.button('Search Movies !'):
                   populateCrew(row[DIRECTOR], row[CAST], rating_stars)
 
      
-      if (search_filter == radio_one) & (is_match):
-            df_similarities = getDfSimilarities(genres)
+         if (search_filter == radio_one) & (is_match):
+            df_similarities = getDfSimilarities(pd.unique(genres_wanted.split()))
             df_similarities['total'] = df_similarities.sum(axis=1)
             df_similarities.sort_values(by=['total'], ascending=False, inplace=True)
 
