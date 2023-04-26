@@ -331,28 +331,30 @@ if container.button('Search Movies !'):
                """, unsafe_allow_html=True
          )
          genres_wanted = ''
+         id_movies_matchs = 0
          for index, row in movies_match.iterrows():
-            rating_stars = populateRatingStars(getRatingScore, row['vote_average'])
-            search = movie_search.search(row[TITLE])
-            genres_wanted += row[GENRES] + ' '
+            if (id_movies_matchs < results_to_display):
+               rating_stars = populateRatingStars(getRatingScore, row['vote_average'])
+               search = movie_search.search(row[TITLE])
+               genres_wanted += row[GENRES] + ' '
 
-            with st.container():
-               populateTitle(id, row[TITLE], row[RELEASE_DATE], row[GENRES], row[RUNTIME])
+               with st.container():
+                  populateTitle(id, row[TITLE], row[RELEASE_DATE], row[GENRES], row[RUNTIME])
 
-               id += 1
-               col1, col2, col3 = st.columns([1,2,1],gap="medium")
-               
-               with col1:
-                  if len(search) > 0:
-                     populateImage(search)
-                  else:
-                     populateImageDefault('assets/default.jpg')
-               with col2:
-                  populateOverview(row[SYNOPSIS])
-               with col3:
-                  populateCrew(row[DIRECTOR], row[CAST], rating_stars)
-
-     
+                  id += 1
+                  col1, col2, col3 = st.columns([1,2,1],gap="medium")
+                  
+                  with col1:
+                     if len(search) > 0:
+                        populateImage(search)
+                     else:
+                        populateImageDefault('assets/default.jpg')
+                  with col2:
+                     populateOverview(row[SYNOPSIS])
+                  with col3:
+                     populateCrew(row[DIRECTOR], row[CAST], rating_stars)
+                  id_movies_matchs += 1
+ 
          if (search_filter == radio_one) & (is_match):
             df_similarities = getDfSimilarities(pd.unique(genres_wanted.split()))
             df_similarities['total'] = df_similarities.sum(axis=1)
@@ -364,6 +366,7 @@ if container.button('Search Movies !'):
             similar_movies = pd.DataFrame()
 
             for index, row in df_similarities.iterrows():
+
                if i < (results_to_display-len(movies_match)):
                   # I want to remove the exact match from the result to not get
                   # them twice (in the exact result, and in the recommended)
@@ -399,11 +402,12 @@ if container.button('Search Movies !'):
                      
                      cast_exact_match = pd.DataFrame()
             
-            st.markdown(f"""
-                        <hr>
-                        <h5>You also might like...</h5>
-                        """, unsafe_allow_html=True
-            ) 
+            if results_to_display > id_movies_matchs: 
+               st.markdown(f"""
+                           <hr>
+                           <h5>You also might like...</h5>
+                           """, unsafe_allow_html=True
+               ) 
 
             for index, row in similar_movies.iterrows():
                rating_stars = populateRatingStars(getRatingScore, row['vote_average'])
