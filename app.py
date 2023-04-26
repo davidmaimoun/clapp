@@ -301,6 +301,8 @@ if search_filter == radio_two:
    col1, col2, col3 = container.columns([1,1,1], gap="medium")
    with col1:
       director = st.selectbox('Director Name', sorted(pd.unique(df_movies[DIRECTOR]))) 
+      results_to_display = st.slider("Number of Results:", 1, 500, 30)
+
    with col2:
       genres = st.selectbox('Movie genres wanted', genres_selection)
    with col3:  
@@ -316,7 +318,11 @@ if search_filter == radio_two:
       movies_match = movies_match.loc[df_movies[GENRES].str.contains(genres, case=False)]
       input += f"genres: {genres}, "
    if len(released) > 0 :
-      movies_match = movies_match.loc[df_movies['release_year'].between(*released)]
+      if released[0] != released[1] :
+         movies_match = movies_match.loc[df_movies['release_year'].between(*released)]
+      else:
+         movies_match = df_movies.query('release_year == @released[0]')
+
       input += f"released in: {released[0]} - {released[1]}"
 
 
